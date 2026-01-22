@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Hours Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            color: #1f2937;
+            font-size: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h2 {
+            color: #1f2937;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .info-box {
+            background: #eef2ff;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            color: #4f46e5;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .info-value.large {
+            font-size: 18px;
+        }
+
+        .summary-box {
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .summary-box.blue { background: #dbeafe; }
+        .summary-box.green { background: #d1fae5; }
+        .summary-box.orange { background: #fed7aa; }
+        .summary-box.yellow { background: #fef3c7; }
+
+        .summary-value.blue { color: #2563eb; }
+        .summary-value.green { color: #059669; }
+        .summary-value.orange { color: #ea580c; }
+        .summary-value.yellow { color: #d97706; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            color: #374151;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        input {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+
+        .btn-edit:hover {
+            background: #d97706;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .close-btn:hover {
+            color: #1f2937;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #2563eb;
+        }
+
+        .note {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f9fafb;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        td {
+            padding: 12px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #ddd6fe;
+            color: #5b21b6;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .badge-leave {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-personal {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px;
+            color: #9ca3af;
+        }
+
+        .emoji {
+            font-size: 16px;
+            margin-left: 8px;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="card">
+            <h1>
+                Work Hours Tracker
+                <span style="font-size: 32px;">🕐</span>
+            </h1>
+            
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Current Time</div>
+                    <div class="info-value" id="currentTime"></div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-label">Date</div>
+                    <div class="info-value large" id="currentDate"></div>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-label">Week of Year</div>
+                    <div class="info-value" id="weekNumber"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Summary -->
+        <div class="card">
+            <h2>Weekly Summary</h2>
+            
+            <div class="info-grid">
+                <div class="summary-box blue">
+                    <div class="info-label">This Week (Actual)</div>
+                    <div class="info-value summary-value blue" id="currentWeekHours">0.00h</div>
+                </div>
+                
+                <div class="summary-box" id="carryOverBox">
+                    <div class="info-label">Carry-Over Balance</div>
+                    <div class="info-value summary-value" id="carryOverHours">0.00h</div>
+                    <div style="font-size: 12px; margin-top: 4px; color: #6b7280;" id="carryOverHistory"></div>
+                </div>
+                
+                <div class="summary-box" id="remainingBox">
+                    <div class="info-label">Hours Remaining</div>
+                    <div class="info-value summary-value" id="remainingHours">38.00h</div>
+                    <div id="targetMet" style="display: none; font-size: 12px; margin-top: 4px;">Target met! 🎉</div>
+                </div>
+            </div>
+            
+            <div id="rolloverAlert" style="display: none; margin-bottom: 16px;"></div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-info" onclick="showWeekHistory()" style="flex: 1;">
+                    📊 View Week History
+                </button>
+                <button class="btn-secondary" onclick="manuallyResetBalance()" style="flex: 1;">
+                    🔄 Reset Balance
+                </button>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="card">
+            <h2>Log Work Hours</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Entry Type</label>
+                    <select id="entryType" onchange="toggleEntryFields()" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                        <option value="work">Work Day</option>
+                        <option value="annual">Annual Leave</option>
+                        <option value="personal">Personal Leave</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="entryDate">
+                </div>
+                
+                <div class="form-group" id="startTimeGroup">
+                    <label>Start Time</label>
+                    <input type="time" id="startTime">
+                </div>
+                
+                <div class="form-group" id="endTimeGroup">
+                    <label>End Time</label>
+                    <input type="time" id="endTime">
+                </div>
+
+                <div class="form-group" id="leaveHoursGroup" style="display: none;">
+                    <label>Hours</label>
+                    <input type="number" id="leaveHours" placeholder="7.5" step="0.5" min="0" max="12" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                </div>
+                
+                <div class="form-group">
+                    <label style="opacity: 0;">Add</label>
+                    <button class="btn-success" onclick="addEntry()">➕ Add Entry</button>
+                </div>
+            </div>
+            
+            <div class="note" id="deductionNote">
+                <strong>Auto-deductions:</strong> 30 min lunch break daily + 1 hour on Fridays
+            </div>
+            <div class="note" id="leaveNote" style="display: none;">
+                <strong>Leave Days:</strong> Enter the number of hours for this leave day (e.g., 7.5 for full day). No lunch deductions apply.
+            </div>
+        </div>
+
+        <!-- Entries List -->
+        <div class="card">
+            <h2>Work Log</h2>
+            
+            <div id="entriesList">
+                <div class="empty-state">
+                    No entries yet. Add your first work log above!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Entry</h3>
+                <button class="close-btn" onclick="closeEditModal()">×</button>
+            </div>
+            
+            <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="form-group">
+                    <label>Entry Type</label>
+                    <select id="editEntryType" onchange="toggleEditFields()" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                        <option value="work">Work Day</option>
+                        <option value="annual">Annual Leave</option>
+                        <option value="personal">Personal Leave</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="editDate">
+                </div>
+                
+                <div class="form-group" id="editStartTimeGroup">
+                    <label>Start Time</label>
+                    <input type="time" id="editStartTime">
+                </div>
+                
+                <div class="form-group" id="editEndTimeGroup">
+                    <label>End Time</label>
+                    <input type="time" id="editEndTime">
+                </div>
+
+                <div class="form-group" id="editLeaveHoursGroup" style="display: none;">
+                    <label>Hours</label>
+                    <input type="number" id="editLeaveHours" placeholder="7.5" step="0.5" min="0" max="12" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+                <button class="btn-success" onclick="saveEdit()" style="flex: 1;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Week History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Weekly Balance History</h3>
+                <button class="close-btn" onclick="closeHistoryModal()">×</button>
+            </div>
+            
+            <div id="historyContent" style="max-height: 400px; overflow-y: auto;">
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="closeHistoryModal()" style="flex: 1;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+        let carryOverHours = 0;
+        let editingEntryId = null;
+        let weekHistory = [];
+        let lastProcessedWeek = null;
+
+        // Initialize
+        function init() {
+            loadData();
+            updateClock();
+            setInterval(updateClock, 1000);
+            document.getElementById('entryDate').valueAsDate = new Date();
+            checkWeekRollover();
+        }
+
+        // Update clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US');
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('weekNumber').textContent = 'Week ' + getWeekNumber(now);
+        }
+
+        // Get week number
+        function getWeekNumber(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // Get week identifier (year-week)
+        function getWeekId(date) {
+            return `${date.getFullYear()}-W${getWeekNumber(date)}`;
+        }
+
+        // Check for week rollover
+        function checkWeekRollover() {
+            const currentWeekId = getWeekId(new Date());
+            
+            if (lastProcessedWeek && lastProcessedWeek !== currentWeekId) {
+                const previousWeekId = lastProcessedWeek;
+                const previousWeekHours = getWeekHoursById(previousWeekId);
+                const difference = previousWeekHours - 38;
+                
+                // Show notification
+                const alertDiv = document.getElementById('rolloverAlert');
+                alertDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>New Week Started!</strong><br>
+                        ${previousWeekId}: ${previousWeekHours.toFixed(2)}h worked (${difference >= 0 ? '+' : ''}${difference.toFixed(2)}h from target)<br>
+                        Carry-over balance updated automatically.
+                    </div>
+                `;
+                alertDiv.style.display = 'block';
+                
+                // Add to history
+                weekHistory.push({
+                    weekId: previousWeekId,
+                    hours: previousWeekHours,
+                    difference: difference,
+                    balanceBefore: carryOverHours,
+                    balanceAfter: carryOverHours + difference,
+                    date: new Date().toISOString()
+                });
+                
+                // Update carry-over
+                carryOverHours += difference;
+                lastProcessedWeek = currentWeekId;
+                saveData();
+                updateSummary();
+                
+                setTimeout(() => {
+                    alertDiv.style.display = 'none';
+                }, 10000);
+            } else if (!lastProcessedWeek) {
+                lastProcessedWeek = currentWeekId;
+                saveData();
+            }
+        }
+
+        // Get week hours by week ID
+        function getWeekHoursById(weekId) {
+            const [year, weekNum] = weekId.split('-W').map(Number);
+            
+            return entries
+                .filter(e => {
+                    const entryDate = new Date(e.date);
+                    return getWeekId(entryDate) === weekId;
+                })
+                .reduce((sum, e) => sum + parseFloat(e.netHours), 0);
+        }
+
+        // Calculate hours
+        function calculateHours(start, end) {
+            const [startHour, startMin] = start.split(':').map(Number);
+            const [endHour, endMin] = end.split(':').map(Number);
+            
+            let hours = endHour - startHour;
+            let minutes = endMin - startMin;
+            
+            if (minutes < 0) {
+                hours -= 1;
+                minutes += 60;
+            }
+            
+            return hours + minutes / 60;
+        }
+
+        // Toggle entry fields based on type
+        function toggleEntryFields() {
+            const entryType = document.getElementById('entryType').value;
+            const isLeave = entryType === 'annual' || entryType === 'personal';
+            
+            document.getElementById('startTimeGroup').style.display = isLeave ? 'none' : 'block';
+            document.getElementById('endTimeGroup').style.display = isLeave ? 'none' : 'block';
+            document.getElementById('leaveHoursGroup').style.display = isLeave ? 'block' : 'none';
+            document.getElementById('deductionNote').style.display = isLeave ? 'none' : 'block';
+            document.getElementById('leaveNote').style.display = isLeave ? 'block' : 'none';
+        }
+
+        // Toggle edit fields based on type
+        function toggleEditFields() {
+            const entryType = document.getElementById('editEntryType').value;
+            const isLeave = entryType === 'annual' || entryType === 'personal';
+            
+            document.getElementById('editStartTimeGroup').style.display = isLeave ? 'none' : 'block';
+            document.getElementById('editEndTimeGroup').style.display = isLeave ? 'none' : 'block';
+            document.getElementById('editLeaveHoursGroup').style.display = isLeave ? 'block' : 'none';
+        }
+
+        // Add entry
+        function addEntry() {
+            const date = document.getElementById('entryDate').value;
+            const entryType = document.getElementById('entryType').value;
+
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            let entry;
+            const dayOfWeek = new Date(date).getDay();
+            const isFriday = dayOfWeek === 5;
+
+            if (entryType === 'work') {
+                const startTime = document.getElementById('startTime').value;
+                const endTime = document.getElementById('endTime').value;
+
+                if (!startTime || !endTime) {
+                    alert('Please enter both start and end times');
+                    return;
+                }
+
+                const grossHours = calculateHours(startTime, endTime);
+                let netHours = grossHours - 0.5;
+                if (isFriday) {
+                    netHours -= 1;
+                }
+
+                entry = {
+                    id: Date.now(),
+                    type: 'work',
+                    date,
+                    startTime,
+                    endTime,
+                    grossHours: grossHours.toFixed(2),
+                    netHours: netHours.toFixed(2),
+                    isFriday
+                };
+            } else {
+                // Leave entry
+                const leaveHours = parseFloat(document.getElementById('leaveHours').value);
+                
+                if (!leaveHours || leaveHours <= 0) {
+                    alert('Please enter valid hours for leave');
+                    return;
+                }
+
+                entry = {
+                    id: Date.now(),
+                    type: entryType,
+                    date,
+                    leaveHours: leaveHours.toFixed(2),
+                    netHours: leaveHours.toFixed(2),
+                    isFriday: false
+                };
+            }
+
+            entries.push(entry);
+            entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            saveData();
+            renderEntries();
+            updateSummary();
+            
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('leaveHours').value = '';
+            
+            checkWeekRollover();
+        }
+
+        // Delete entry
+        function deleteEntry(id) {
+            if (confirm('Are you sure you want to delete this entry?')) {
+                entries = entries.filter(e => e.id !== id);
+                saveData();
+                renderEntries();
+                updateSummary();
+            }
+        }
+
+        // Open edit modal
+        function editEntry(id) {
+            const entry = entries.find(e => e.id === id);
+            if (!entry) return;
+
+            editingEntryId = id;
+            document.getElementById('editDate').value = entry.date;
+            document.getElementById('editEntryType').value = entry.type || 'work';
+            
+            if (entry.type === 'annual' || entry.type === 'personal') {
+                document.getElementById('editLeaveHours').value = entry.leaveHours;
+            } else {
+                document.getElementById('editStartTime').value = entry.startTime;
+                document.getElementById('editEndTime').value = entry.endTime;
+            }
+            
+            toggleEditFields();
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingEntryId = null;
+        }
+
+        // Save edit
+        function saveEdit() {
+            const date = document.getElementById('editDate').value;
+            const entryType = document.getElementById('editEntryType').value;
+
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            const entryIndex = entries.findIndex(e => e.id === editingEntryId);
+            if (entryIndex === -1) return;
+
+            let updatedEntry;
+            const dayOfWeek = new Date(date).getDay();
+            const isFriday = dayOfWeek === 5;
+
+            if (entryType === 'work') {
+                const startTime = document.getElementById('editStartTime').value;
+                const endTime = document.getElementById('editEndTime').value;
+
+                if (!startTime || !endTime) {
+                    alert('Please enter both start and end times');
+                    return;
+                }
+
+                const grossHours = calculateHours(startTime, endTime);
+                let netHours = grossHours - 0.5;
+                if (isFriday) {
+                    netHours -= 1;
+                }
+
+                updatedEntry = {
+                    id: editingEntryId,
+                    type: 'work',
+                    date,
+                    startTime,
+                    endTime,
+                    grossHours: grossHours.toFixed(2),
+                    netHours: netHours.toFixed(2),
+                    isFriday
+                };
+            } else {
+                const leaveHours = parseFloat(document.getElementById('editLeaveHours').value);
+                
+                if (!leaveHours || leaveHours <= 0) {
+                    alert('Please enter valid hours for leave');
+                    return;
+                }
+
+                updatedEntry = {
+                    id: editingEntryId,
+                    type: entryType,
+                    date,
+                    leaveHours: leaveHours.toFixed(2),
+                    netHours: leaveHours.toFixed(2),
+                    isFriday: false
+                };
+            }
+
+            entries[entryIndex] = updatedEntry;
+            entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            saveData();
+            renderEntries();
+            updateSummary();
+            closeEditModal();
+            checkWeekRollover();
+        }
+
+        // Show week history
+        function showWeekHistory() {
+            const historyContent = document.getElementById('historyContent');
+            
+            if (weekHistory.length === 0) {
+                historyContent.innerHTML = '<div class="empty-state" style="padding: 24px;">No week history yet. Complete a week to see history!</div>';
+            } else {
+                let html = '<table><thead><tr>';
+                html += '<th>Week</th><th>Hours Worked</th><th>Difference</th><th>Balance After</th>';
+                html += '</tr></thead><tbody>';
+                
+                [...weekHistory].reverse().forEach(week => {
+                    const diffColor = week.difference >= 0 ? '#059669' : '#ea580c';
+                    const balanceColor = week.balanceAfter >= 0 ? '#059669' : '#ea580c';
+                    
+                    html += `<tr>
+                        <td style="font-weight: 600;">${week.weekId}</td>
+                        <td>${week.hours.toFixed(2)}h</td>
+                        <td style="color: ${diffColor}; font-weight: 600;">${week.difference >= 0 ? '+' : ''}${week.difference.toFixed(2)}h</td>
+                        <td style="color: ${balanceColor}; font-weight: 600;">${week.balanceAfter >= 0 ? '+' : ''}${week.balanceAfter.toFixed(2)}h</td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+                historyContent.innerHTML = html;
+            }
+            
+            document.getElementById('historyModal').classList.add('active');
+        }
+
+        // Close history modal
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('active');
+        }
+
+        // Manually reset balance
+        function manuallyResetBalance() {
+            if (confirm('Are you sure you want to reset your carry-over balance to 0? This cannot be undone.')) {
+                carryOverHours = 0;
+                weekHistory = [];
+                saveData();
+                updateSummary();
+                alert('Balance has been reset to 0 hours.');
+            }
+        }
+
+        // Render entries
+        function renderEntries() {
+            const container = document.getElementById('entriesList');
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="empty-state">No entries yet. Add your first work log above!</div>';
+                return;
+            }
+
+            let html = '<table><thead><tr>';
+            html += '<th>Date</th><th>Day</th><th>Type</th><th>Start</th><th>End</th>';
+            html += '<th>Gross Hours</th><th>Net Hours</th><th>Actions</th>';
+            html += '</tr></thead><tbody>';
+
+            entries.forEach(entry => {
+                const date = new Date(entry.date);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                const entryType = entry.type || 'work';
+                
+                let typeDisplay = 'Work';
+                let typeBadge = '';
+                
+                if (entryType === 'annual') {
+                    typeDisplay = 'Annual Leave';
+                    typeBadge = '<span class="badge badge-leave">Annual</span>';
+                } else if (entryType === 'personal') {
+                    typeDisplay = 'Personal Leave';
+                    typeBadge = '<span class="badge badge-personal">Personal</span>';
+                }
+                
+                html += `<tr>
+                    <td>${entry.date}</td>
+                    <td>${dayName}${entry.isFriday ? '<span class="badge">-1h</span>' : ''}</td>
+                    <td>${typeBadge || 'Work'}</td>`;
+                
+                if (entryType === 'work') {
+                    html += `
+                        <td>${entry.startTime}</td>
+                        <td>${entry.endTime}</td>
+                        <td>${entry.grossHours}h</td>
+                        <td style="font-weight: 600; color: #4f46e5;">${entry.netHours}h</td>`;
+                } else {
+                    html += `
+                        <td colspan="2" style="text-align: center; color: #6b7280;">-</td>
+                        <td style="color: #6b7280;">-</td>
+                        <td style="font-weight: 600; color: #4f46e5;">${entry.netHours}h</td>`;
+                }
+                
+                html += `
+                    <td>
+                        <button class="btn-edit" onclick="editEntry(${entry.id})">Edit</button>
+                        <button class="btn-danger" onclick="deleteEntry(${entry.id})">Delete</button>
+                    </td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Update summary
+        function updateSummary() {
+            const currentWeekTotal = getCurrentWeekHours();
+            const adjustedTotal = currentWeekTotal + carryOverHours;
+            const remaining = 38 - adjustedTotal;
+
+            document.getElementById('currentWeekHours').textContent = currentWeekTotal.toFixed(2) + 'h';
+            document.getElementById('carryOverHours').textContent = 
+                (carryOverHours >= 0 ? '+' : '') + carryOverHours.toFixed(2) + 'h';
+            document.getElementById('remainingHours').textContent = 
+                (remaining > 0 ? remaining.toFixed(2) : '0.00') + 'h';
+
+            // Show last update info
+            if (weekHistory.length > 0) {
+                const lastWeek = weekHistory[weekHistory.length - 1];
+                document.getElementById('carryOverHistory').textContent = 
+                    `Last updated: ${lastWeek.weekId}`;
+            }
+
+            // Update colors
+            const carryBox = document.getElementById('carryOverBox');
+            const carryValue = document.getElementById('carryOverHours');
+            if (carryOverHours >= 0) {
+                carryBox.className = 'summary-box green';
+                carryValue.className = 'info-value summary-value green';
+            } else {
+                carryBox.className = 'summary-box orange';
+                carryValue.className = 'info-value summary-value orange';
+            }
+
+            const remainBox = document.getElementById('remainingBox');
+            const remainValue = document.getElementById('remainingHours');
+            const targetMet = document.getElementById('targetMet');
+            if (remaining <= 0) {
+                remainBox.className = 'summary-box green';
+                remainValue.className = 'info-value summary-value green';
+                targetMet.style.display = 'block';
+            } else {
+                remainBox.className = 'summary-box yellow';
+                remainValue.className = 'info-value summary-value yellow';
+                targetMet.style.display = 'none';
+            }
+        }
+
+        // Get current week hours
+        function getCurrentWeekHours() {
+            const currentWeek = getWeekNumber(new Date());
+            const currentYear = new Date().getFullYear();
+            
+            return entries
+                .filter(e => {
+                    const entryDate = new Date(e.date);
+                    return getWeekNumber(entryDate) === currentWeek && 
+                           entryDate.getFullYear() === currentYear;
+                })
+                .reduce((sum, e) => sum + parseFloat(e.netHours), 0);
+        }
+
+        // Get last week hours
+        function getLastWeekHours() {
+            const lastWeek = getWeekNumber(new Date()) - 1;
+            const currentYear = new Date().getFullYear();
+            
+            return entries
+                .filter(e => {
+                    const entryDate = new Date(e.date);
+                    return getWeekNumber(entryDate) === lastWeek && 
+                           entryDate.getFullYear() === currentYear;
+                })
+                .reduce((sum, e) => sum + parseFloat(e.netHours), 0);
+        }
+
+        // Show week history
+        function showWeekHistory() {
+            const historyContent = document.getElementById('historyContent');
+            
+            if (weekHistory.length === 0) {
+                historyContent.innerHTML = '<div class="empty-state" style="padding: 24px;">No week history yet. Complete a week to see history!</div>';
+            } else {
+                let html = '<table><thead><tr>';
+                html += '<th>Week</th><th>Hours Worked</th><th>Difference</th><th>Balance After</th>';
+                html += '</tr></thead><tbody>';
+                
+                [...weekHistory].reverse().forEach(week => {
+                    const diffColor = week.difference >= 0 ? '#059669' : '#ea580c';
+                    const balanceColor = week.balanceAfter >= 0 ? '#059669' : '#ea580c';
+                    
+                    html += `<tr>
+                        <td style="font-weight: 600;">${week.weekId}</td>
+                        <td>${week.hours.toFixed(2)}h</td>
+                        <td style="color: ${diffColor}; font-weight: 600;">${week.difference >= 0 ? '+' : ''}${week.difference.toFixed(2)}h</td>
+                        <td style="color: ${balanceColor}; font-weight: 600;">${week.balanceAfter >= 0 ? '+' : ''}${week.balanceAfter.toFixed(2)}h</td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+                historyContent.innerHTML = html;
+            }
+            
+            document.getElementById('historyModal').classList.add('active');
+        }
+
+        // Close history modal
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('active');
+        }
+
+        // Manually reset balance
+        function manuallyResetBalance() {
+            if (confirm('Are you sure you want to reset your carry-over balance to 0? This cannot be undone.')) {
+                carryOverHours = 0;
+                weekHistory = [];
+                saveData();
+                updateSummary();
+                alert('Balance has been reset to 0 hours.');
+            }
+        }
+
+        // Save data
+        function saveData() {
+            localStorage.setItem('workEntries', JSON.stringify(entries));
+            localStorage.setItem('carryOver', carryOverHours.toString());
+            localStorage.setItem('weekHistory', JSON.stringify(weekHistory));
+            localStorage.setItem('lastProcessedWeek', lastProcessedWeek);
+        }
+
+        // Load data
+        function loadData() {
+            const savedEntries = localStorage.getItem('workEntries');
+            const savedCarryOver = localStorage.getItem('carryOver');
+            const savedHistory = localStorage.getItem('weekHistory');
+            const savedLastWeek = localStorage.getItem('lastProcessedWeek');
+            
+            if (savedEntries) {
+                entries = JSON.parse(savedEntries);
+                renderEntries();
+            }
+            
+            if (savedCarryOver) {
+                carryOverHours = parseFloat(savedCarryOver);
+            }
+
+            if (savedHistory) {
+                weekHistory = JSON.parse(savedHistory);
+            }
+
+            if (savedLastWeek) {
+                lastProcessedWeek = savedLastWeek;
+            }
+            
+            updateSummary();
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
