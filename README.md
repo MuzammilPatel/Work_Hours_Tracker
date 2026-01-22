@@ -229,10 +229,49 @@ Hours Remaining = 38 - (This week hours + Carry-over balance)
 ## ⚠️ Important Notes
 
 ### Data Storage
-- Data is stored in your browser's local storage
-- Each browser has separate storage (Chrome data ≠ Firefox data)
-- Clearing browser data/cookies will delete your entries
-- No cloud sync or backup (data stays on your computer)
+
+#### Where Your Data is Saved
+Your work log is saved in your **browser's Local Storage**, which means:
+- Stored on your computer in your browser's internal database
+- **NOT** saved in the HTML file itself
+- **NOT** stored on any cloud or server
+- **NOT** synced between devices or browsers
+
+#### Storage Locations by Browser
+
+**Windows:**
+- **Chrome/Edge**: `C:\Users\[YourName]\AppData\Local\Google\Chrome\User Data\Default\Local Storage`
+- **Firefox**: `C:\Users\[YourName]\AppData\Roaming\Mozilla\Firefox\Profiles\[profile]\storage\default`
+
+**Mac:**
+- **Chrome**: `~/Library/Application Support/Google/Chrome/Default/Local Storage`
+- **Safari**: `~/Library/Safari/LocalStorage`
+
+**Linux:**
+- **Chrome**: `~/.config/google-chrome/Default/Local Storage`
+- **Firefox**: `~/.mozilla/firefox/[profile]/storage/default`
+
+#### What Gets Stored
+The app saves these items in localStorage:
+- `workEntries` - All your work and leave entries
+- `carryOver` - Your carry-over balance
+- `weekHistory` - History of completed weeks
+- `lastProcessedWeek` - Last week that was processed
+
+#### Key Storage Facts
+- ✅ Data persists between browser sessions (survives closing browser)
+- ✅ Each browser has separate storage (Chrome data ≠ Firefox data)
+- ❌ Clearing browser data/cookies will delete your entries permanently
+- ❌ Incognito/Private mode does NOT save data
+- ❌ No cloud sync or automatic backup
+- ❌ Data cannot be transferred between browsers automatically
+
+#### How to Protect Your Data
+1. **Use the same browser consistently** - Pick Chrome, Firefox, or Edge and stick with it
+2. **Don't clear browser data** - Be careful when clearing cookies/cache
+3. **Take regular screenshots** - Backup important weeks manually
+4. **Avoid incognito mode** - Data won't be saved in private browsing
+5. **Export data regularly** - Use browser developer tools to backup localStorage if needed
 
 ### Browser Compatibility
 - Works in all modern browsers:
